@@ -23,14 +23,14 @@ sudo sysctl -w vm.max_map_count=262144
 
 ### Config Host
 ```bash
-linux: etc/hosts
-```
+patch: etc/hosts
 
 127.0.1.1	arcux.local
 127.0.1.1	mail.arcux.local
 127.0.1.1	pma.arcux.local
 127.0.1.1	jenkins.arcux.local
 127.0.1.1	sonar.arcux.local
+```
 
 ### Run project
 ```bash
