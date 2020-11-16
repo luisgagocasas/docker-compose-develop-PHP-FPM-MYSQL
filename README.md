@@ -1,4 +1,4 @@
-# docker-compose Develop in PHP-FPM and MYSQL
+# docker-compose PHP-FPM and MYSQL
 
 Example config to make PHP-FPM container work with Nginx.
 
@@ -10,20 +10,21 @@ sudo sysctl -w vm.max_map_count=262144
 
 ### Used software
 
-- jwilder/nginx-proxy (Nginx Proxy)
-- nginx for (pagespeed)
-- php-fpm:7.3
-- mysql:8.0.20
-- mailhog (email local)
-- sonarqube (evaluate code)
-- memcached (cache)
-- newrelic (monitoring)
-- jenkins (automatización)
-- phpmyadmin (MySQL administration)
+- [jwilder/nginx-proxy (Nginx Proxy)](https://hub.docker.com/r/jwilder/nginx-proxy)
+- [nginx for (pagespeed)](https://hub.docker.com/r/crunchgeek/nginx-pagespeed)
+- [php-fpm:7.3](https://hub.docker.com/r/crunchgeek/php-fpm)
+- [mysql](https://hub.docker.com/_/mysql)
+- [mailhog (email local)](https://hub.docker.com/r/mailhog/mailhog)
+- [sonarqube (evaluate code)](https://hub.docker.com/_/sonarqube)
+- [memcached (cache)](https://hub.docker.com/_/memcached)
+- [newrelic (monitoring)](https://hub.docker.com/r/newrelic/infrastructure)
+- [jenkins (automatización)](https://hub.docker.com/_/jenkins)
+- [phpmyadmin (MySQL administration)](https://hub.docker.com/_/phpmyadmin)
 
-### Config Host
+### Config Host (Added lines finish file)
 ```bash
-patch: etc/hosts
+Patch Linux: etc/hosts
+Patch Windows: C:/Windows/System32/drivers/etc
 
 127.0.1.1	arcux.local
 127.0.1.1	mail.arcux.local
@@ -44,3 +45,8 @@ docker-compose up -d
 - PHPMYADMIN: `http://pma.arcux.local`
 - JENKINS: `http://jenkins.arcux.local`
 - SONARQUBE: `http://sonar.arcux.local`
+
+### OTHER LINKS
+
+- SPEED ADMIN: `http://arcux.local/pagespeed_admin`
+- NEWRELIC: `https://newrelic.com/`
