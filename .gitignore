@@ -1,3 +1,5 @@
 jenkins/*
 mysql/*
 sonarqube/*
+app/bedrock
+app/date.txt
