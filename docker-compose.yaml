@@ -42,6 +42,7 @@ services:
     volumes:
       - ./app:/var/www/html
       - ./config:/config
+      - ./boot_scripts:/boot_scripts
     env_file: php-fpm.env
 
   mysql:
@@ -60,96 +61,96 @@ services:
     cap_add:
       - SYS_NICE
 
-  # mailhog:
-  #   image: mailhog/mailhog
-  #   container_name: mailhog
-  #   networks:
-  #     - red
-  #   expose:
-  #     - "1025"
-  #   environment:
-  #     VIRTUAL_HOST: mail.arcux.local
-  #     VIRTUAL_PORT: 8025
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    networks:
+      - red
+    expose:
+      - "1025"
+    environment:
+      VIRTUAL_HOST: mail.arcux.local
+      VIRTUAL_PORT: 8025
 
-  # sonarqube:
-  #   image: sonarqube:8.5.1-community
-  #   container_name: sonarqube
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - postgres
-  #   networks:
-  #     - red
-  #   environment:
-  #     VIRTUAL_HOST: sonar.arcux.local
-  #     VIRTUAL_PORT: 9000
-  #     sonar.jdbc.url: jdbc:postgresql://postgres:5432/sonar
-  #     sonar.jdbc.username: sonar
-  #     sonar.jdbc.password: sonar
-  #   volumes:
-  #     - ./sonarqube/data:/opt/sonarqube/data
-  #     - ./sonarqube/extensions:/opt/sonarqube/extensions
-  #     - ./sonarqube/logs:/opt/sonarqube/logs
-  #     - ./sonarqube/temp:/opt/sonarqube/temp
+  memcached:
+    image: memcached:1.6.8-alpine
+    container_name: memcached
+    networks:
+      - red
 
-  # postgres:
-  #   image: postgres
-  #   container_name: postgres
-  #   environment:
-  #     POSTGRES_USER: sonar
-  #     POSTGRES_PASSWORD: sonar
-  #   networks:
-  #     - red
-  #   volumes:
-  #     - ./sonarqube/postgresql:/var/lib/postgresql
-  #     - ./sonarqube/postgresql/data:/var/lib/postgresql/data
+  jenkins:
+    image: jenkins/jenkins:2.249.3-lts-centos
+    container_name: jenkins
+    user: root
+    networks:
+      - red
+    volumes:
+      - ./jenkins:/var/jenkins_home
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      VIRTUAL_HOST: jenkins.arcux.local
+      VIRTUAL_PORT: 8080
 
-  # memcached:
-  #   image: memcached:1.6.8-alpine
-  #   container_name: memcached
-  #   networks:
-  #     - red
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpMyadmin
+    links:
+      - mysql
+    networks:
+      - red
+    environment:
+      VIRTUAL_HOST: pma.arcux.local
+      PMA_ARBITRARY: 1
+      PMA_HOST: mysql
+    volumes:
+      - ./config/php.ini:/usr/local/etc/php/php.ini
 
-  # agent:
-  #   container_name: newrelic
-  #   image: newrelic/infrastructure:1.13.1-rc
-  #   cap_add:
-  #     - SYS_PTRACE
-  #   network_mode: host
-  #   pid: host
-  #   privileged: true
-  #   volumes:
-  #     - "/:/host:ro"
-  #     - "/var/run/docker.sock:/var/run/docker.sock"
-  #   env_file:
-  #     - newrelic.env
-  #   restart: unless-stopped
+  agent:
+    container_name: newrelic
+    image: newrelic/infrastructure:1.13.1-rc
+    cap_add:
+      - SYS_PTRACE
+    network_mode: host
+    pid: host
+    privileged: true
+    volumes:
+      - "/:/host:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    env_file:
+      - newrelic.env
+    restart: unless-stopped
 
-  # jenkins:
-  #   image: jenkins/jenkins:2.249.3-lts-centos
-  #   container_name: jenkins
-  #   user: root
-  #   networks:
-  #     - red
-  #   volumes:
-  #     - ./jenkins:/var/jenkins_home
-  #     - "/var/run/docker.sock:/var/run/docker.sock"
-  #   environment:
-  #     VIRTUAL_HOST: jenkins.arcux.local
-  #     VIRTUAL_PORT: 8080
+  sonarqube:
+    image: sonarqube:8.5.1-community
+    container_name: sonarqube
+    restart: unless-stopped
+    links:
+      - postgres
+    networks:
+      - red
+    environment:
+      VIRTUAL_HOST: sonar.arcux.local
+      VIRTUAL_PORT: 9000
+      sonar.jdbc.url: jdbc:postgresql://postgres:5432/sonar
+      sonar.jdbc.username: sonar
+      sonar.jdbc.password: sonar
+    volumes:
+      - ./sonarqube/data:/opt/sonarqube/data
+      - ./sonarqube/extensions:/opt/sonarqube/extensions
+      - ./sonarqube/logs:/opt/sonarqube/logs
+      - ./sonarqube/temp:/opt/sonarqube/temp
 
-  # phpmyadmin:
-  #   image: phpmyadmin/phpmyadmin
-  #   container_name: phpMyadmin
-  #   links:
-  #     - mysql
-  #   networks:
-  #     - red
-  #   environment:
-  #     VIRTUAL_HOST: pma.arcux.local
-  #     PMA_ARBITRARY: 1
-  #     PMA_HOST: mysql
-  #   volumes:
-  #     - ./config/php.ini:/usr/local/etc/php/php.ini
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+    networks:
+      - red
+    volumes:
+      - ./sonarqube/postgresql:/var/lib/postgresql
+      - ./sonarqube/postgresql/data:/var/lib/postgresql/data
 
 networks:
   red:
